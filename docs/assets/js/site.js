@@ -50,4 +50,31 @@
       }
     });
   }
+  /* Cookie choice. Analytics (if a gaId is set) loads only after Accept. */
+  var GA_ID = "";
+  var store = {
+    get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var loadAnalytics = function () {
+    if (!GA_ID || window.__gaLoaded) return;
+    window.__gaLoaded = true;
+    var s = document.createElement("script");
+    s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date()); window.gtag("config", GA_ID);
+  };
+  var banner = document.getElementById("cookie"), choice = store.get("cookies");
+  if (choice === "yes") loadAnalytics();
+  if (banner) {
+    if (choice !== "yes" && choice !== "no") banner.hidden = false;
+    var decide = function (v) { store.set("cookies", v); banner.hidden = true; if (v === "yes") loadAnalytics(); };
+    document.getElementById("cookie-yes").addEventListener("click", function () { decide("yes"); });
+    document.getElementById("cookie-no").addEventListener("click", function () { decide("no"); });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cookie-open]"), function (a) {
+      a.addEventListener("click", function (e) { e.preventDefault(); banner.hidden = false; });
+    });
+  }
 })();
