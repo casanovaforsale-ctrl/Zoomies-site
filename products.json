@@ -1,0 +1,62 @@
+{
+  "_about": "The shop list. tools/build.py turns it into the product cards and the search-engine product data. Only live TikTok Shop listings belong here. ATLAS can rewrite this file when listings change; the link for each card is built from its TikTok product id.",
+  "updated": "2026-11-06",
+  "products": [
+    {
+      "id": "1732646825723139009",
+      "title": "Christmas Advent Calendar for Kids, 24 Day Countdown Blind Box",
+      "alt": "Christmas advent calendar blind box with 24 numbered doors",
+      "price": "34.99",
+      "stock": 694
+    },
+    {
+      "id": "1732646861725864897",
+      "title": "Rubber Duck Advent Calendar, 24 Holiday Ducks",
+      "alt": "Rubber duck advent calendar with 24 costumed holiday ducks",
+      "price": "29.99",
+      "stock": 1387
+    },
+    {
+      "id": "1732646774760051649",
+      "title": "Magic Trick Advent Calendar, a Magic Prop Behind Every Door",
+      "alt": "Magic trick advent calendar with beginner magic props",
+      "price": "29.99",
+      "stock": 474
+    },
+    {
+      "id": "1732679560535249857",
+      "title": "Gemstone Advent Calendar, 24 Natural Stones and Crystals",
+      "alt": "Gemstone advent calendar with natural stones and crystals",
+      "price": "34.99",
+      "stock": 425
+    },
+    {
+      "id": "1732679514351113153",
+      "title": "Crystal Pendant Advent Calendar, 24 Gemstone Pendants",
+      "alt": "Crystal pendant advent calendar with gemstone pendants",
+      "price": "34.99",
+      "stock": 329
+    },
+    {
+      "id": "1732713057454035905",
+      "title": "Fishing Lure Advent Calendar, 24 Lures for Anglers",
+      "alt": "Fishing lure advent calendar with 24 lures",
+      "price": "19.99",
+      "stock": 20
+    },
+    {
+      "id": "1732679436000072641",
+      "title": "Dog and Cat Eye Drops, Gentle Daily Tear Stain Cleaner",
+      "alt": "Bottle of gentle eye drops for dogs and cats",
+      "price": "16.99",
+      "stock": 943
+    },
+    {
+      "id": "1732679586363708353",
+      "title": "Halloween Countdown Calendar, 24 Costumed Rubber Ducks",
+      "alt": "Halloween countdown calendar with costumed rubber ducks",
+      "price": "29.99",
+      "stock": 175
+    }
+  ]
+}
