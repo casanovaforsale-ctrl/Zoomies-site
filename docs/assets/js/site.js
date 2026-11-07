@@ -77,13 +77,20 @@
       // Close on a tap outside the player, but only when the press started there too and
       // not on the second click of a double-click on "Watch video" (the backdrop covers it).
       dlg.addEventListener("pointerdown", function (e) { pressedOutside = e.target === dlg; });
+      // The rest of a double-click or double-tap on "Watch video" can land on Close or the
+      // TikTok link once the player is open; swallow it (the video's own controls excepted).
+      dlg.addEventListener("click", function (e) {
+        if (e.target !== vid && (e.detail > 1 || Date.now() - openedAt < 400)) { e.preventDefault(); e.stopImmediatePropagation(); }
+      }, true);
       dlg.addEventListener("click", function (e) {
         if (e.target === dlg && pressedOutside && e.detail < 2 && Date.now() - openedAt > 400) shut();
         pressedOutside = false;
       });
       // Going to TikTok, or leaving the tab, stops the clip so its sound doesn't play on.
-      buy.addEventListener("click", shut);
-      document.addEventListener("visibilitychange", function () { if (document.hidden && dlg.open) vid.pause(); });
+      buy.addEventListener("click", function (e) { if (!(e.ctrlKey || e.metaKey || e.shiftKey)) shut(); });
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && dlg.open && document.pictureInPictureElement !== vid) vid.pause();
+      });
       dlg.addEventListener("close", function () {
         vid.pause(); vid.removeAttribute("src"); vid.removeAttribute("poster"); vid.load();
         root.classList.remove("vid-open");
