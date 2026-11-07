@@ -162,10 +162,10 @@ p { margin: 0 0 1em; }
 
 /* Product video player (opened by .card-play) */
 /* The gutter keeps the page from shifting; paint it like the dimmed page behind the player. */
-html.vid-open { overflow: hidden; scrollbar-gutter: stable; background: color-mix(in srgb, rgb(20 8 28) 86%, var(--cream)); }
+html.vid-open { overflow: hidden; scrollbar-gutter: stable; background: color-mix(in srgb, rgb(20 8 28) 93%, var(--cream)); }
 .vid { padding: 8px; border: 0; background: transparent; color: #fff; max-width: calc(100vw - 16px); max-height: calc(100vh - 16px); overflow: auto; overscroll-behavior: contain; }
 @supports (height: 100dvh) { .vid { max-height: calc(100dvh - 16px); } }
-.vid::backdrop { background: rgb(20 8 28 / .86); }
+.vid::backdrop { background: rgb(20 8 28 / .93); }
 /* --w is the video's width: as wide as fits with room left for the caption and buttons */
 .vid-box { --w: min(calc(100vw - 32px), calc((100vh - 11rem) * 9 / 16), 420px); width: max(var(--w), min(calc(100vw - 32px), 300px)); display: grid; gap: .75rem; justify-items: center; }
 @supports (height: 100dvh) { .vid-box { --w: min(calc(100vw - 32px), calc((100dvh - 11rem) * 9 / 16), 420px); } }
