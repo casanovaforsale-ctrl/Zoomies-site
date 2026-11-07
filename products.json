@@ -1,6 +1,6 @@
 {
   "_about": "The shop list. tools/build.py turns it into the product cards and the search-engine product data. Only live TikTok Shop listings belong here. ATLAS can rewrite this file when listings change; the link for each card is built from its TikTok product id.",
-  "updated": "2026-11-06",
+  "updated": "2026-11-07",
   "products": [
     {
       "id": "1732646825723139009",
@@ -49,7 +49,7 @@
       "title": "Dog and Cat Eye Drops, Gentle Daily Tear Stain Cleaner",
       "alt": "Bottle of gentle eye drops for dogs and cats",
       "price": "22.99",
-      "stock": 935
+      "stock": 927
     },
     {
       "id": "1732679586363708353",
