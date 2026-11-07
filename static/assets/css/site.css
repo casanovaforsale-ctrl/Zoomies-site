@@ -13,6 +13,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 html, body { overflow-x: clip; }
+html { scroll-padding-top: 5rem; } /* keep focused or linked items clear of the sticky header */
 body { margin: 0; background: var(--cream); color: var(--ink); font: 400 1.05rem/1.65 var(--body); }
 img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }

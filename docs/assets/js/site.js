@@ -68,8 +68,14 @@
         '<button class="btn btn-sm btn-ghost vid-x" type="button" autofocus>Close</button></div></div>';
       document.body.appendChild(dlg);
       var vid = dlg.querySelector("video"), cap = dlg.querySelector(".vid-cap"), buy = dlg.querySelector(".vid-buy"),
-        root = document.documentElement, opener = null, openedAt = 0, pressedOutside = false;
-      var shut = function () { if (dlg.open) dlg.close(); };
+        root = document.documentElement, opener = null, openedAt = 0, closedAt = 0, pressedOutside = false;
+      var shut = function () { if (dlg.open) { closedAt = Date.now(); dlg.close(); } };
+      // ...and the rest of a double-click on Close or outside the player, so it can't land
+      // on the card underneath and open TikTok or another video.
+      document.addEventListener("click", function (e) {
+        var since = Date.now() - closedAt;
+        if (!dlg.open && since < 500 && (e.detail > 1 || since < 350)) { e.preventDefault(); e.stopImmediatePropagation(); }
+      }, true);
       dlg.querySelector(".vid-x").addEventListener("click", shut);
       vid.addEventListener("error", function () {
         if (dlg.open && vid.getAttribute("src")) cap.textContent = "This video won't load right now. It's also on the TikTok Shop page.";
