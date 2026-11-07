@@ -50,6 +50,75 @@
       }
     });
   }
+  /* Product videos. A card's "Watch video" button plays the clip in a pop-up
+     player; Esc, Close or a tap outside closes it and stops the sound. */
+  var plays = document.querySelectorAll(".card-play");
+  if (plays.length) {
+    var dlg = document.createElement("dialog");
+    if (typeof dlg.showModal !== "function") {
+      Array.prototype.forEach.call(plays, function (b) {
+        b.addEventListener("click", function () { location.href = b.getAttribute("data-video"); });
+      });
+    } else {
+      dlg.className = "vid";
+      dlg.setAttribute("aria-labelledby", "vid-cap");
+      dlg.innerHTML = '<div class="vid-box"><video controls playsinline preload="none"></video>' +
+        '<p class="vid-cap" id="vid-cap"></p><div class="vid-row">' +
+        '<a class="btn btn-sm vid-buy" target="_blank" rel="noopener">See it on TikTok Shop</a>' +
+        '<button class="btn btn-sm btn-ghost vid-x" type="button" autofocus>Close</button></div></div>';
+      document.body.appendChild(dlg);
+      var vid = dlg.querySelector("video"), cap = dlg.querySelector(".vid-cap"), buy = dlg.querySelector(".vid-buy"),
+        root = document.documentElement, opener = null, openedAt = 0, closedAt = 0, pressedOutside = false;
+      var shut = function () { if (dlg.open) { closedAt = Date.now(); dlg.close(); } };
+      // ...and the rest of a double-click on Close or outside the player, so it can't land
+      // on the card underneath and open TikTok or another video.
+      document.addEventListener("click", function (e) {
+        var since = Date.now() - closedAt;
+        if (!dlg.open && since < 500 && (e.detail > 1 || since < 350)) { e.preventDefault(); e.stopImmediatePropagation(); }
+      }, true);
+      dlg.querySelector(".vid-x").addEventListener("click", shut);
+      vid.addEventListener("error", function () {
+        if (dlg.open && vid.getAttribute("src")) cap.textContent = "This video won't load right now. It's also on the TikTok Shop page.";
+      });
+      // Close on a tap outside the player, but only when the press started there too and
+      // not on the second click of a double-click on "Watch video" (the backdrop covers it).
+      dlg.addEventListener("pointerdown", function (e) { pressedOutside = e.target === dlg; });
+      // The rest of a double-click or double-tap on "Watch video" can land on Close or the
+      // TikTok link once the player is open; swallow it (the video's own controls excepted).
+      dlg.addEventListener("click", function (e) {
+        if (e.target !== vid && (e.detail > 1 || Date.now() - openedAt < 400)) { e.preventDefault(); e.stopImmediatePropagation(); }
+      }, true);
+      dlg.addEventListener("click", function (e) {
+        if (e.target === dlg && pressedOutside && e.detail < 2 && Date.now() - openedAt > 400) shut();
+        pressedOutside = false;
+      });
+      // Going to TikTok, or leaving the tab, stops the clip so its sound doesn't play on.
+      buy.addEventListener("click", function (e) { if (!(e.ctrlKey || e.metaKey || e.shiftKey)) shut(); });
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && dlg.open && document.pictureInPictureElement !== vid) vid.pause();
+      });
+      dlg.addEventListener("close", function () {
+        vid.pause(); vid.removeAttribute("src"); vid.removeAttribute("poster"); vid.load();
+        root.classList.remove("vid-open");
+        if (opener) opener.focus();
+      });
+      Array.prototype.forEach.call(plays, function (b) {
+        b.addEventListener("click", function () {
+          opener = b;
+          cap.textContent = b.getAttribute("data-title") || "";
+          buy.href = b.getAttribute("data-href") || "#shop";
+          vid.poster = b.getAttribute("data-poster") || "";
+          vid.src = b.getAttribute("data-video");
+          root.classList.add("vid-open");
+          dlg.showModal();
+          openedAt = Date.now();
+          var go = vid.play();
+          if (go && go.catch) go.catch(function () {});
+        });
+      });
+    }
+  }
+
   /* Cookie choice. Analytics (if a gaId is set) loads only after Accept. */
   var GA_ID = "";
   var store = {
