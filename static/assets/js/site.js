@@ -67,16 +67,26 @@
         '<a class="btn btn-sm vid-buy" target="_blank" rel="noopener">See it on TikTok Shop</a>' +
         '<button class="btn btn-sm btn-ghost vid-x" type="button" autofocus>Close</button></div></div>';
       document.body.appendChild(dlg);
-      var vid = dlg.querySelector("video"), cap = dlg.querySelector(".vid-cap"), buy = dlg.querySelector(".vid-buy"), opener = null;
+      var vid = dlg.querySelector("video"), cap = dlg.querySelector(".vid-cap"), buy = dlg.querySelector(".vid-buy"),
+        root = document.documentElement, opener = null, openedAt = 0, pressedOutside = false;
       var shut = function () { if (dlg.open) dlg.close(); };
       dlg.querySelector(".vid-x").addEventListener("click", shut);
       vid.addEventListener("error", function () {
         if (dlg.open && vid.getAttribute("src")) cap.textContent = "This video won't load right now. It's also on the TikTok Shop page.";
       });
-      dlg.addEventListener("click", function (e) { if (e.target === dlg) shut(); });
+      // Close on a tap outside the player, but only when the press started there too and
+      // not on the second click of a double-click on "Watch video" (the backdrop covers it).
+      dlg.addEventListener("pointerdown", function (e) { pressedOutside = e.target === dlg; });
+      dlg.addEventListener("click", function (e) {
+        if (e.target === dlg && pressedOutside && e.detail < 2 && Date.now() - openedAt > 400) shut();
+        pressedOutside = false;
+      });
+      // Going to TikTok, or leaving the tab, stops the clip so its sound doesn't play on.
+      buy.addEventListener("click", shut);
+      document.addEventListener("visibilitychange", function () { if (document.hidden && dlg.open) vid.pause(); });
       dlg.addEventListener("close", function () {
         vid.pause(); vid.removeAttribute("src"); vid.removeAttribute("poster"); vid.load();
-        document.body.classList.remove("vid-open");
+        root.classList.remove("vid-open");
         if (opener) opener.focus();
       });
       Array.prototype.forEach.call(plays, function (b) {
@@ -86,8 +96,9 @@
           buy.href = b.getAttribute("data-href") || "#shop";
           vid.poster = b.getAttribute("data-poster") || "";
           vid.src = b.getAttribute("data-video");
-          document.body.classList.add("vid-open");
+          root.classList.add("vid-open");
           dlg.showModal();
+          openedAt = Date.now();
           var go = vid.play();
           if (go && go.catch) go.catch(function () {});
         });
