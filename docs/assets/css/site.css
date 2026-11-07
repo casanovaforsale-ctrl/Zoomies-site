@@ -102,11 +102,20 @@ p { margin: 0 0 1em; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.6rem; margin: 2.6rem 0 1.4rem; }
 .card { position: relative; display: grid; gap: .7rem; align-content: start; text-decoration: none; background: var(--paper); border: 2px solid var(--rule); border-radius: var(--radius); padding: 12px 12px 1.1rem; rotate: var(--r); transition: rotate .35s cubic-bezier(.3, 1.6, .5, 1), transform .35s ease, box-shadow .35s ease; }
 .card:hover { rotate: 0deg; transform: translateY(-8px); box-shadow: 0 24px 40px -24px rgb(58 20 80 / .5); }
-.card-img { display: block; border-radius: 12px; overflow: hidden; background: #fff; }
+.card-img { position: relative; display: block; border-radius: 12px; overflow: hidden; background: #fff; }
 .card-img img { width: 100%; aspect-ratio: 1; object-fit: cover; transition: transform .5s ease; }
 .card:hover .card-img img { transform: scale(1.07); }
-.card-no { position: absolute; z-index: 2; top: -12px; left: -10px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 700; font-size: .85rem; box-shadow: 0 4px 10px rgb(0 0 0 / .2); }
+.card-no { pointer-events: none; position: absolute; z-index: 2; top: -12px; left: -10px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 700; font-size: .85rem; box-shadow: 0 4px 10px rgb(0 0 0 / .2); }
 .card-title { font-weight: 500; font-size: .95rem; line-height: 1.45; color: var(--ink); padding-inline: .3rem; }
+/* The title link stretches over the whole card, so a tap anywhere opens the product
+   while the video button above it stays its own control. */
+.card-link { text-decoration: none; }
+.card-link::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: var(--radius); }
+.card-link:focus-visible { outline: none; }
+.card-link:focus-visible::after { outline: 3px solid var(--teal); outline-offset: 3px; }
+.card-play { position: absolute; z-index: 2; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: .35rem; min-height: 44px; font: 700 .85rem/1 var(--body); color: #fff; background: rgb(58 20 80 / .9); border: 0; border-radius: 999px; padding: 0 1rem 0 .75rem; cursor: pointer; box-shadow: 0 4px 12px rgb(0 0 0 / .28); transition: transform .15s ease, background-color .15s ease; }
+.card-play svg { fill: currentColor; flex: none; }
+.card-play:hover { background: var(--orange); transform: translateY(-2px); }
 .card-price { justify-self: start; margin-left: .3rem; font-family: var(--marker); font-size: 1.35rem; color: #fff; background: var(--orange); padding: .15rem .8rem .05rem; border-radius: 8px; rotate: -3deg; box-shadow: 0 3px 0 #b8460c; }
 .card-flag { justify-self: start; margin-left: .3rem; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--plum-2); }
 .note { color: var(--mute); font-size: .92rem; }
@@ -148,6 +157,18 @@ p { margin: 0 0 1em; }
 .zoomer.run { animation: zoomie 1.6s cubic-bezier(.5, 0, .4, 1) forwards; }
 .zoomer img { filter: drop-shadow(0 8px 10px rgb(0 0 0 / .2)); }
 @keyframes zoomie { 0% { transform: translateX(-160px) translateY(0); } 25% { transform: translateX(25vw) translateY(-26px); } 50% { transform: translateX(50vw) translateY(0); } 75% { transform: translateX(75vw) translateY(-26px); } 100% { transform: translateX(calc(100vw + 160px)) translateY(0); } }
+
+/* Product video player (opened by .card-play) */
+body.vid-open { overflow: hidden; }
+.vid { padding: 0; border: 0; background: transparent; color: #fff; max-width: none; max-height: none; overflow: visible; }
+.vid::backdrop { background: rgb(20 8 28 / .86); }
+.vid-box { --w: min(calc(100vw - 32px), calc((100vh - 10rem) * 9 / 16), 420px); width: var(--w); display: grid; gap: .75rem; justify-items: center; }
+@supports (height: 100dvh) { .vid-box { --w: min(calc(100vw - 32px), calc((100dvh - 10rem) * 9 / 16), 420px); } }
+.vid video { display: block; width: 100%; aspect-ratio: 9 / 16; height: auto; background: #000; border-radius: 14px; }
+.vid-cap { margin: 0; text-align: center; font-weight: 600; line-height: 1.35; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.vid-row { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; }
+.vid .btn-ghost { color: #fff; box-shadow: inset 0 0 0 2px #fff; }
+.vid .btn-ghost:hover { background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 2px #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

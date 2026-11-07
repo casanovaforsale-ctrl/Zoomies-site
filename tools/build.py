@@ -27,6 +27,11 @@ PRODUCTS_FILE = HERE / "products.json"
 # to the full product page.
 PRODUCT_URL = "https://www.tiktok.com/shop/pdp/{id}"
 LOW_STOCK = 25
+# A product video is picked up from static/assets/video/shop/<id>.mp4, with an
+# optional <id>.jpg poster beside it, so ATLAS rewriting products.json never
+# drops it. Keep each file H.264 + AAC with the index at the front (faststart)
+# so it plays in every browser.
+VIDEO_DIR = "assets/video/shop"
 TILTS = ("-2.5deg", "1.8deg", "-1.2deg", "2.4deg", "-1.8deg", "1.2deg", "-2.2deg", "1.6deg")
 
 
@@ -49,26 +54,44 @@ def load_products():
             "stock": int(p.get("stock", 0) or 0),
             "image": p.get("image") or f"assets/img/shop/{pid}.webp",
             "url": p.get("url") or PRODUCT_URL.format(id=pid),
+            "video": None,
+            "poster": None,
         })
+        video = f"{VIDEO_DIR}/{pid}.mp4"
+        if (STATIC / video).is_file():
+            poster = f"{VIDEO_DIR}/{pid}.jpg"
+            items[-1]["video"] = video
+            items[-1]["poster"] = poster if (STATIC / poster).is_file() else items[-1]["image"]
     return items
 
 
+PLAY_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>'
+
+
 def product_cards(items):
+    # Each card is an <article> whose title link stretches over the whole card
+    # (see .card-link in site.css), so the "Watch video" button can sit on the
+    # photo without being nested inside a link.
     esc = lambda s: html.escape(s, quote=True)
     out = []
     for i, p in enumerate(items):
         flag = ""
         if 0 < p["stock"] <= LOW_STOCK:
             flag = f'\n        <span class="card-flag">Only {p["stock"]} left</span>'
+        play = ""
+        if p["video"]:
+            play = (f'<button class="card-play" type="button" data-video="{{{{root}}}}{esc(p["video"])}" '
+                    f'data-poster="{{{{root}}}}{esc(p["poster"])}" data-title="{esc(p["title"])}" '
+                    f'data-href="{esc(p["url"])}" aria-label="Watch video: {esc(p["title"])}">'
+                    f'{PLAY_ICON}<span>Watch video</span></button>')
         out.append(
-            f'      <a class="card" href="{esc(p["url"])}" target="_blank" rel="noopener" '
-            f'style="--r:{TILTS[i % len(TILTS)]}" data-product="{p["id"]}">\n'
-            f'        <span class="card-no">{i + 1:02d}</span>\n'
+            f'      <article class="card" style="--r:{TILTS[i % len(TILTS)]}" data-product="{p["id"]}">\n'
+            f'        <span class="card-no" aria-hidden="true">{i + 1:02d}</span>\n'
             f'        <span class="card-img"><img src="{{{{root}}}}{esc(p["image"])}" width="600" height="600" '
-            f'alt="{esc(p["alt"])}" loading="lazy"></span>\n'
-            f'        <span class="card-title">{esc(p["title"])}</span>\n'
+            f'alt="{esc(p["alt"])}" loading="lazy">{play}</span>\n'
+            f'        <a class="card-title card-link" href="{esc(p["url"])}" target="_blank" rel="noopener">{esc(p["title"])}</a>\n'
             f'        <span class="card-price">${p["price"]}</span>{flag}\n'
-            f'      </a>')
+            f'      </article>')
     return "\n".join(out)
 
 

@@ -50,6 +50,51 @@
       }
     });
   }
+  /* Product videos. A card's "Watch video" button plays the clip in a pop-up
+     player; Esc, Close or a tap outside closes it and stops the sound. */
+  var plays = document.querySelectorAll(".card-play");
+  if (plays.length) {
+    var dlg = document.createElement("dialog");
+    if (typeof dlg.showModal !== "function") {
+      Array.prototype.forEach.call(plays, function (b) {
+        b.addEventListener("click", function () { location.href = b.getAttribute("data-video"); });
+      });
+    } else {
+      dlg.className = "vid";
+      dlg.setAttribute("aria-labelledby", "vid-cap");
+      dlg.innerHTML = '<div class="vid-box"><video controls playsinline preload="none"></video>' +
+        '<p class="vid-cap" id="vid-cap"></p><div class="vid-row">' +
+        '<a class="btn btn-sm vid-buy" target="_blank" rel="noopener">See it on TikTok Shop</a>' +
+        '<button class="btn btn-sm btn-ghost vid-x" type="button" autofocus>Close</button></div></div>';
+      document.body.appendChild(dlg);
+      var vid = dlg.querySelector("video"), cap = dlg.querySelector(".vid-cap"), buy = dlg.querySelector(".vid-buy"), opener = null;
+      var shut = function () { if (dlg.open) dlg.close(); };
+      dlg.querySelector(".vid-x").addEventListener("click", shut);
+      vid.addEventListener("error", function () {
+        if (dlg.open && vid.getAttribute("src")) cap.textContent = "This video won't load right now. It's also on the TikTok Shop page.";
+      });
+      dlg.addEventListener("click", function (e) { if (e.target === dlg) shut(); });
+      dlg.addEventListener("close", function () {
+        vid.pause(); vid.removeAttribute("src"); vid.removeAttribute("poster"); vid.load();
+        document.body.classList.remove("vid-open");
+        if (opener) opener.focus();
+      });
+      Array.prototype.forEach.call(plays, function (b) {
+        b.addEventListener("click", function () {
+          opener = b;
+          cap.textContent = b.getAttribute("data-title") || "";
+          buy.href = b.getAttribute("data-href") || "#shop";
+          vid.poster = b.getAttribute("data-poster") || "";
+          vid.src = b.getAttribute("data-video");
+          document.body.classList.add("vid-open");
+          dlg.showModal();
+          var go = vid.play();
+          if (go && go.catch) go.catch(function () {});
+        });
+      });
+    }
+  }
+
   /* Cookie choice. Analytics (if a gaId is set) loads only after Accept. */
   var GA_ID = "";
   var store = {
